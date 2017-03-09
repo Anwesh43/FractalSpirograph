@@ -5,3 +5,11 @@
 ##To run
 
 ### python -m SimpleHTTPServer
+
+##Code to create and drawing a new Circle
+
+```
+    const circle = new Circle(x,y,radius,speed)
+    circle.draw()
+    circle.rotate()
+```
