@@ -42,3 +42,28 @@ class Circle {
        this.deg += speed
     }
 }
+var initCircles = ()=>{
+    for(var i=0;i<4;i++) {
+        circles.push(new Circle(startX,startY,startRadius))
+        startX = 0
+        startY = -startRadius
+        startRadius/=3
+        startY -=startRadius
+    }
+    for(var i=3;i>=1 ;i--) {
+        circles[i-1].setNeighbor(circles[i])
+    }
+}
+setDimensions()
+initCircles()
+
+var render = ()=>{
+    context.clearRect(0,0,canvas.width,canvas.height)
+    if(circles.length>0) {
+        circles[0].draw()
+    }
+    circles.forEach((circle)=>{
+        circle.rotate()
+    })
+}
+setInterval(render,100)
