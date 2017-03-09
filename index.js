@@ -9,7 +9,7 @@ var setDimensions = ()=>{
     canvas.height = window.innerHeight
     startX = canvas.width/2
     startY = canvas.height/2
-    startRadius = 2*Math.min(canvas.width,canvas.height)/7
+    startRadius = Math.min(canvas.width,canvas.height)/4
     context = canvas.getContext('2d')
 }
 window.onresize = ()=>{
@@ -92,12 +92,11 @@ initCircles()
 
 var render = ()=>{
     context.clearRect(0,0,canvas.width,canvas.height)
-
+    context.lineCap="round"
     if(circles.length>0) {
         circles[0].draw()
         pathX = circles[0]
     }
-
     circles.forEach((circle)=>{
          circle.rotate()
     })
