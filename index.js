@@ -1,6 +1,6 @@
 var canvas = document.getElementById('c1')
 var context = canvas.getContext('2d')
-var speed = 1,k = 4
+var speed = 1,k = 5
 var startRadius  = 100,startX = 100,startY = 100
 var circles = []
 var spiroPathX = [],spiroPathY = []
