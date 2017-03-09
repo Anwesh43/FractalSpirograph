@@ -1,6 +1,6 @@
 var canvas = document.getElementById('c1')
 var context = canvas.getContext('2d')
-var speed = 1
+var speed = 1,k = 4
 var startRadius  = 100,startX = 100,startY = 100
 var circles = []
 var spiroPathX = [],spiroPathY = []
@@ -9,7 +9,7 @@ var setDimensions = ()=>{
     canvas.height = window.innerHeight
     startX = canvas.width/2
     startY = canvas.height/2
-    startRadius = Math.min(canvas.width,canvas.height)/4
+    startRadius = 2*Math.min(canvas.width,canvas.height)/7
     context = canvas.getContext('2d')
 }
 window.onresize = ()=>{
@@ -48,7 +48,12 @@ class Circle {
     updateMidPointOfNeighbor() {
         var neighbor = this.neighbor
         if(neighbor!=undefined) {
-            neighbor.setMidPoint(this.mx+(neighbor.r+this.r)*Math.cos((this.mDeg+this.deg-90)*Math.PI/180),this.my+(neighbor.r+this.r)*Math.sin((this.mDeg+this.deg-90)*Math.PI/180),this.mDeg+this.deg)
+            if(neighbor.neighbor!=undefined) {
+                neighbor.setMidPoint(this.mx+(neighbor.r+this.r)*Math.cos((this.mDeg+this.deg-90)*Math.PI/180),this.my+(neighbor.r+this.r)*Math.sin((this.mDeg+this.deg-90)*Math.PI/180),this.mDeg+this.deg)
+            }
+            else {
+                neighbor.setMidPoint(this.mx+(2*neighbor.r+this.r)*Math.cos((this.mDeg+this.deg-90)*Math.PI/180),this.my+(2*neighbor.r+this.r)*Math.sin((this.mDeg+this.deg-90)*Math.PI/180),this.mDeg+this.deg)
+            }
         }
     }
     rotate() {
@@ -56,16 +61,17 @@ class Circle {
     }
 }
 var initCircles = ()=>{
-    for(var i=0;i<4;i++) {
-        circles.push(new Circle(startX,startY,startRadius,speed))
+    for(var i=0;i<10;i++) {
+        var dir = i%2==0 ?-1:1
+        circles.push(new Circle(startX,startY,startRadius,speed*dir))
         startX = 0
         startY = -startRadius
-        startRadius/=3
+        startRadius/=(7/2)
         startY -=startRadius
-        speed+=1
+        speed*=k
     }
     circles[0].setMidPoint(canvas.width/2,canvas.height/2,0)
-    for(var i=3;i>=1 ;i--) {
+    for(var i=9;i>=1 ;i--) {
         circles[i-1].setNeighbor(circles[i])
     }
     updateSpiroPath()
@@ -75,14 +81,9 @@ var updateSpiroPath = ()=>{
         circle.updateMidPointOfNeighbor()
     })
     if(circles.length>2) {
-       var circle = circles[circles.length-2]
-       var neighbor = circle.neighbor
-       if(neighbor!=undefined) {
-            var x = circle.mx+(circle.r+2*neighbor.r)*(Math.cos((circle.mDeg+neighbor.deg-90)*Math.PI/180))
-            var y = circle.my+(circle.r+2*neighbor.r)*(Math.sin((circle.mDeg+neighbor.deg-90)*Math.PI/180))
-            spiroPathX.push(x)
-            spiroPathY.push(y)
-       }
+       var circle = circles[circles.length-1]
+       spiroPathX.push(circle.mx)
+       spiroPathY.push(circle.my)
     }
 
 }
@@ -101,15 +102,22 @@ var render = ()=>{
          circle.rotate()
     })
     updateSpiroPath()
+    context.strokeStyle="red"
     context.beginPath()
     for(var i=0;i<spiroPathX.length;i++) {
+        var x = spiroPathX[i],y = spiroPathY[i]
         if(i == 0) {
-            context.moveTo(spiroPathX[i],spiroPathY[i])
+            context.moveTo(x,y)
         }
         else {
-            context.lineTo(spiroPathX[i],spiroPathY[i])
+            context.lineTo(x,y)
         }
+
     }
     context.stroke()
+    if(circles.length>0 && Math.abs(circles[0].deg)>=360) {
+        console.log("clear")
+        clearInterval(interval)
+    }
 }
-setInterval(render,100)
+var interval = setInterval(render,30)
